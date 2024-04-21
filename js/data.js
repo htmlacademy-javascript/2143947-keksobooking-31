@@ -11,13 +11,13 @@ export const TITLES = [
   'Гостиница Nova'
 ];
 
-export const TYPES = [
-  'palace',
-  'flat',
-  'house',
-  'bungalow',
-  'hotel'
-];
+export const Types = {
+  palace: 'Дворец',
+  flat: 'Квартира',
+  house: 'Дом',
+  bungalow: 'Бунгало',
+  hotel: 'Отель',
+};
 
 export const ROOMS_RANGE = [
   1,
