@@ -1,2 +1,6 @@
-import './get-offers.js';
-import './render-offers.js';
+import {renderOffer} from './render-offers.js';
+import {disableForm, disableMapFilters} from './form.js';
+
+renderOffer();
+disableForm();
+disableMapFilters();
