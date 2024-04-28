@@ -16,7 +16,7 @@ const getRandomTitle = () => getRandomArrayElement(data.TITLES);
 const getRandomLat = () => getRandomFloat(data.LAT_RANGE[0], data.LAT_RANGE[1]).toFixed(5);
 const getRandomLng = () => getRandomFloat(data.LNG_RANGE[0], data.LNG_RANGE[1]).toFixed(5);
 const getRandomPrice = () => getRandomInteger(data.PRICE_RANGE[0], data.PRICE_RANGE[1]);
-const getRandomType = () => getRandomArrayElement(Object.values(data.Types));
+const getRandomType = () => getRandomArrayElement(data.TYPES);
 const getRandomRooms = () => getRandomInteger(data.ROOMS_RANGE[0], data.ROOMS_RANGE[1]);
 const getRandomGuests = () => getRandomInteger(data.GUESTS_RANGE[0], data.GUESTS_RANGE[1]);
 const getRandomCheckTime = () => getRandomArrayElement(data.CHECK_TIME);

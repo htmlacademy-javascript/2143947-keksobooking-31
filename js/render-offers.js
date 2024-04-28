@@ -1,20 +1,36 @@
-import {offersDescriptions} from './get-offers.js';
-
-export const offersList = document.querySelector('.map__canvas');
+const offersList = document.querySelector('.map__canvas');
 const offerTemplate = document.querySelector('#card').content.querySelector('.popup');
+
+const translateType = (type) => {
+  switch (type) {
+    case 'flat':
+      return 'Квартира';
+    case 'bungalow':
+      return 'Бунгало';
+    case 'house':
+      return 'Дом';
+    case 'palace':
+      return 'Дворец';
+    case 'hotel':
+      return 'Отель';
+    default:
+      return type;
+  }
+};
 
 const checkElementText = (element, cardElement, elementText) => {
   if (elementText === undefined) {
     elementText = element;
   }
-  if (element !== undefined || element !== '') {
+  if (element !== '') {
     cardElement.textContent = elementText;
   } else {
     offerTemplate.removeChild(cardElement);
   }
 };
 
-export const renderOffer = () => {
+export const renderOffer = (offers) => {
+  const {author, offer} = offers;
   const offerFragment = document.createDocumentFragment();
   const offerElement = offerTemplate.cloneNode(true);
   const offerElementTitle = offerElement.querySelector('.popup__title');
@@ -30,30 +46,27 @@ export const renderOffer = () => {
   const offerElementPhotosList = offerElement.querySelectorAll('.popup__photos img');
   const offerElementAvatar = offerElement.querySelector('.popup__avatar');
 
-  checkElementText(offersDescriptions[1].offer.title, offerElementTitle);
-  checkElementText(offersDescriptions[1].offer.address, offerElementAddress);
-  checkElementText(offersDescriptions[1].offer.price, offerElementPrice, `${offersDescriptions[1].offer.price} ₽/ночь`);
-  checkElementText(offersDescriptions[1].offer.type, offerElementType);
+  checkElementText(offer.title, offerElementTitle);
+  checkElementText(offer.address, offerElementAddress);
+  checkElementText(offer.price, offerElementPrice, `${offer.price} ₽/ночь`);
+  checkElementText(translateType(offer.type), offerElementType);
 
-  if (offersDescriptions[1].offer.rooms !== undefined || offersDescriptions[1].offer.rooms !== '' || offersDescriptions[1].offer.guests !== undefined || offersDescriptions[1].offer.guests !== '') {
-    offerElementCapacity.textContent = `${offersDescriptions[1].offer.rooms} комнаты для ${offersDescriptions[1].offer.guests} гостей`;
-  } else {
-    offerTemplate.removeChild(offerElementCapacity);
+  offerElementCapacity.textContent = `${offer.rooms} комнаты для ${offer.guests} гостей`;
+  offerElementTime.textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;
+
+  offerElementFeatures.innerHTML = '';
+  for (let i = 0; i < offer.features.length; i++) {
+    const featureElement = document.createElement('li');
+    featureElement.classList.add('popup__feature', `popup__feature--${offer.features[i]}`);
+    offerElementFeatures.appendChild(featureElement);
   }
 
-  if (offersDescriptions[1].offer.checkin !== undefined || offersDescriptions[1].offer.checkin !== '' || offersDescriptions[1].offer.checkout !== undefined || offersDescriptions[1].offer.checkout !== '') {
-    offerElementTime.textContent = `Заезд после ${offersDescriptions[1].offer.checkin}, выезд до ${offersDescriptions[1].offer.checkout}`;
-  } else {
-    offerTemplate.removeChild(offerElementTime);
-  }
+  checkElementText(offer.description, offerElementDescription);
 
-  checkElementText(offersDescriptions[1].offer.features, offerElementFeatures); // Нужно вынести в отдельную функцию!!!
-  checkElementText(offersDescriptions[1].offer.description, offerElementDescription);
-
-  if (offersDescriptions[1].offer.photos.length !== 0) {
-    for (let i = 0; i < offersDescriptions[1].offer.photos.length; i++) {
+  if (offer.photos.length !== 0) {
+    for (let i = 0; i < offer.photos.length; i++) {
       const imgElement = offerElementPhoto.cloneNode(true);
-      imgElement.src = offersDescriptions[1].offer.photos[i];
+      imgElement.src = offer.photos[i];
       offerElementPhotos.appendChild(imgElement);
     }
     offerElementPhotos.removeChild(offerElementPhotosList[0]);
@@ -61,8 +74,8 @@ export const renderOffer = () => {
     offerElementPhotos.removeChild(offerElementPhotosList[0]);
   }
 
-  if (offersDescriptions[1].author.avatar !== undefined || offersDescriptions[1].author.avatar !== '') {
-    offerElementAvatar.src = offersDescriptions[1].author.avatar;
+  if (author.avatar !== '') {
+    offerElementAvatar.src = author.avatar;
   } else {
     offerTemplate.removeChild(offerElementAvatar);
   }
