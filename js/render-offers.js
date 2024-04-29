@@ -1,4 +1,3 @@
-const offersList = document.querySelector('.map__canvas');
 const offerTemplate = document.querySelector('#card').content.querySelector('.popup');
 
 const translateType = (type) => {
@@ -81,6 +80,7 @@ export const renderOffer = (offers) => {
   }
 
   offerFragment.appendChild(offerElement);
-  offersList.appendChild(offerFragment);
+
+  return offerFragment;
 };
 

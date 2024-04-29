@@ -22,6 +22,7 @@ const guestsField = form.querySelector('#capacity');
 const typeField = form.querySelector('#type');
 const timeInField = form.querySelector('#timein');
 const timeOutField = form.querySelector('#timeout');
+export const addressField = form.querySelector('#address');
 const submitButton = form.querySelector('.ad-form__submit');
 const SubmitButtonText = {
   IDLE: 'Опубликовать',
