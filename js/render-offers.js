@@ -30,7 +30,6 @@ const checkElementText = (element, cardElement, elementText) => {
 
 export const renderOffer = (offers) => {
   const {author, offer} = offers;
-  const offerFragment = document.createDocumentFragment();
   const offerElement = offerTemplate.cloneNode(true);
   const offerElementTitle = offerElement.querySelector('.popup__title');
   const offerElementAddress = offerElement.querySelector('.popup__text--address');
@@ -79,8 +78,6 @@ export const renderOffer = (offers) => {
     offerTemplate.removeChild(offerElementAvatar);
   }
 
-  offerFragment.appendChild(offerElement);
-
-  return offerFragment;
+  return offerElement;
 };
 
