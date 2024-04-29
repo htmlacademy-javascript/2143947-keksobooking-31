@@ -18,3 +18,4 @@ export const enableMapFilters = () => {
   });
   mapFeatures.removeAttribute('disabled');
 };
+

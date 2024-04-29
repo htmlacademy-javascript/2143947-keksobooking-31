@@ -11,10 +11,10 @@ const iconConfig = [
   },
   {
     url: './img/pin.svg',
-    width: 52,
-    height: 52,
-    anchorX: 26,
-    anchorY: 52,
+    width: 40,
+    height: 40,
+    anchorX: 20,
+    anchorY: 40,
   }
 ];
 

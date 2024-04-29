@@ -1,5 +1,6 @@
 const form = document.querySelector('.ad-form');
 const formElements = form.querySelectorAll('.ad-form__element');
+const sliderElement = form.querySelector('.ad-form__slider');
 
 export const disableForm = () => {
   form.classList.add('ad-form--disabled');
@@ -161,3 +162,24 @@ function destroyPristine() {
   pristine.destroy();
 }
 
+noUiSlider.create(sliderElement, {
+  start: 5000,
+  connect: [true, false],
+  range: {
+    'min': 0,
+    'max': 100000,
+  },
+  format: {
+    to: function (value) {
+      return value.toFixed(0);
+    },
+    from: function (value) {
+      return parseFloat(value);
+    },
+  },
+  step: 500,
+});
+
+sliderElement.noUiSlider.on('update', (values, handle) => {
+  priceField.value = values[handle];
+});
