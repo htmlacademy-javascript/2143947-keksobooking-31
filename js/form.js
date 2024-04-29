@@ -162,6 +162,8 @@ function destroyPristine() {
   pristine.destroy();
 }
 
+// Слайдер
+
 noUiSlider.create(sliderElement, {
   start: 5000,
   connect: [true, false],
@@ -182,4 +184,8 @@ noUiSlider.create(sliderElement, {
 
 sliderElement.noUiSlider.on('update', (values, handle) => {
   priceField.value = values[handle];
+});
+
+priceField.addEventListener('change', () => {
+  sliderElement.noUiSlider.set(priceField.value);
 });

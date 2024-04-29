@@ -51,6 +51,8 @@ export const mapRender = (onLoad, address, points, renderPopup) => {
 
   mainPinMarker.addTo(map);
 
+  address.value = `${Object.values(startCoordinate)[0].toFixed(5)}, ${Object.values(startCoordinate)[1].toFixed(5)}`;
+
   mainPinMarker.on('moveend', (evt) => {
     address.value = `${Object.values(evt.target.getLatLng())[0].toFixed(5)}, ${Object.values(evt.target.getLatLng())[1].toFixed(5)}`;
   });
