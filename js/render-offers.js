@@ -21,7 +21,7 @@ const checkElementText = (element, cardElement, elementText) => {
   if (elementText === undefined) {
     elementText = element;
   }
-  if (element !== '') {
+  if (element) {
     cardElement.textContent = elementText;
   } else {
     offerTemplate.removeChild(cardElement);
@@ -52,27 +52,30 @@ export const renderOffer = (offers) => {
   offerElementCapacity.textContent = `${offer.rooms} комнаты для ${offer.guests} гостей`;
   offerElementTime.textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;
 
-  offerElementFeatures.innerHTML = '';
-  for (let i = 0; i < offer.features.length; i++) {
-    const featureElement = document.createElement('li');
-    featureElement.classList.add('popup__feature', `popup__feature--${offer.features[i]}`);
-    offerElementFeatures.appendChild(featureElement);
+  if (offer.features) {
+    offerElementFeatures.innerHTML = '';
+    for (let i = 0; i < offer.features.length; i++) {
+      const featureElement = document.createElement('li');
+      featureElement.classList.add('popup__feature', `popup__feature--${offer.features[i]}`);
+      offerElementFeatures.appendChild(featureElement);
+    }
+  } else {
+    offerTemplate.removeChild(offerElementFeatures);
   }
 
   checkElementText(offer.description, offerElementDescription);
 
-  if (offer.photos.length !== 0) {
+  if (offer.photos.length) {
     for (let i = 0; i < offer.photos.length; i++) {
       const imgElement = offerElementPhoto.cloneNode(true);
       imgElement.src = offer.photos[i];
       offerElementPhotos.appendChild(imgElement);
     }
-    offerElementPhotos.removeChild(offerElementPhotosList[0]);
-  } else {
-    offerElementPhotos.removeChild(offerElementPhotosList[0]);
   }
 
-  if (author.avatar !== '') {
+  offerElementPhotos.removeChild(offerElementPhotosList[0]);
+
+  if (author.avatar) {
     offerElementAvatar.src = author.avatar;
   } else {
     offerTemplate.removeChild(offerElementAvatar);

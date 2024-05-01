@@ -27,7 +27,7 @@ const startCoordinate = {
   lng: 139.69171,
 };
 
-export const mapRender = (onLoad, address, points, renderPopup) => {
+export const renderMap = (onLoad, address, points, renderPopup) => {
   const map = L.map('map-canvas')
     .on('load', () => {
       onLoad();

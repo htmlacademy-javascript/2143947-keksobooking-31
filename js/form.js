@@ -1,3 +1,6 @@
+const TITLE_LENGTH_MIN = 30;
+const TITLE_LENGTH_MAX = 100;
+
 const form = document.querySelector('.ad-form');
 const formElements = form.querySelectorAll('.ad-form__element');
 const sliderElement = form.querySelector('.ad-form__slider');
@@ -33,18 +36,12 @@ const SubmitButtonText = {
 const pristine = new Pristine (form, {
   classTo: 'ad-form__element',
   errorTextParent: 'ad-form__element',
-  errorTextClass: 'ad-form__element--invalid',
+  errorClass: 'ad-form__element--invalid',
 }, false);
-
 
 // Валидация заголовка
 
-function validateTitle(value) {
-  if (value.length >= 30 && value.length <= 100) {
-    return true;
-  }
-  return false;
-}
+const validateTitle = (value) => (value.length >= TITLE_LENGTH_MIN && value.length <= TITLE_LENGTH_MAX);
 
 pristine.addValidator(
   titleField,
@@ -64,7 +61,7 @@ const minPriceAmount = {
 
 let priceErrorMessage = '';
 
-function validatePrice(value) {
+const validatePrice = (value) => {
   if (value > 100000) {
     priceErrorMessage = 'Не более 100 000 руб.';
     return false;
@@ -76,7 +73,7 @@ function validatePrice(value) {
   }
 
   return true;
-}
+};
 
 pristine.addValidator(
   priceField,
@@ -84,10 +81,10 @@ pristine.addValidator(
   () => priceErrorMessage,
 );
 
-function onTypeChange () {
+const onTypeChange = () => {
   priceField.placeholder = minPriceAmount[this.value];
   pristine.validate(priceField);
-}
+};
 
 typeField.addEventListener('change', onTypeChange);
 
@@ -100,9 +97,7 @@ const roomsBookingOptions = {
   '100': ['0'],
 };
 
-function validateRoomsBooking () {
-  return roomsBookingOptions[roomsField.value].includes(guestsField.value);
-}
+const validateRoomsBooking = () => roomsBookingOptions[roomsField.value].includes(guestsField.value);
 
 pristine.addValidator(
   roomsField,
@@ -140,7 +135,7 @@ const blockSubmitButton = () => {
 
 // Отправка формы
 
-const submitOffer = () => {
+export const submitOffer = () => {
   form.addEventListener('submit', (evt) => {
     evt.preventDefault();
 
@@ -148,19 +143,17 @@ const submitOffer = () => {
 
     if (isValid) {
       blockSubmitButton();
-      destroyPristine();
+      pristine.reset();
     }
   });
 };
 
-submitOffer();
-
 // Отключение pristine
 
-function destroyPristine() {
-  pristine.reset();
-  pristine.destroy();
-}
+// const destroyPristine = () => {
+//   pristine.reset();
+//   pristine.destroy();
+// };
 
 // Слайдер
 
