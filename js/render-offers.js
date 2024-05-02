@@ -24,7 +24,7 @@ const checkElementText = (element, cardElement, elementText) => {
   if (element) {
     cardElement.textContent = elementText;
   } else {
-    offerTemplate.removeChild(cardElement);
+    cardElement.remove();
   }
 };
 
@@ -60,12 +60,12 @@ export const renderOffer = (offers) => {
       offerElementFeatures.appendChild(featureElement);
     }
   } else {
-    offerTemplate.removeChild(offerElementFeatures);
+    offerElementFeatures.remove();
   }
 
   checkElementText(offer.description, offerElementDescription);
 
-  if (offer.photos.length) {
+  if (offer.photos?.length) {
     for (let i = 0; i < offer.photos.length; i++) {
       const imgElement = offerElementPhoto.cloneNode(true);
       imgElement.src = offer.photos[i];
