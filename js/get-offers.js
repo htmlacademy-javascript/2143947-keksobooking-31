@@ -1,8 +1,8 @@
 import * as data from './data.js';
-import * as util from './util.js';
+import {getRandomArrayElement, getRandomFloat, getRandomInteger, shuffleArray, randomNumberArray} from './util.js';
 
-const randomNumbersArray = util.shuffleArray(util.randomNumberArray(1, data.OFFERS_COUNT));
-export const randomAvatarIndexArray = [];
+const randomNumbersArray = shuffleArray(randomNumberArray(1, data.OFFERS_COUNT));
+const randomAvatarIndexArray = [];
 
 for (let i = 0; i < randomNumbersArray.length; i++) {
   if (randomNumbersArray[i] < 10) {
@@ -12,19 +12,19 @@ for (let i = 0; i < randomNumbersArray.length; i++) {
   }
 }
 
-export const getRandomTitle = () => util.getRandomArrayElement(data.TITLES);
-export const getRandomLat = () => util.getRandomFloat(data.LAT_RANGE[0], data.LAT_RANGE[1]).toFixed(5);
-export const getRandomLng = () => util.getRandomFloat(data.LNG_RANGE[0], data.LNG_RANGE[1]).toFixed(5);
-export const getRandomPrice = () => util.getRandomInteger(data.PRICE_RANGE[0], data.PRICE_RANGE[1]);
-export const getRandomType = () => util.getRandomArrayElement(Object.values(data.Types));
-export const getRandomRooms = () => util.getRandomInteger(data.ROOMS_RANGE[0], data.ROOMS_RANGE[1]);
-export const getRandomGuests = () => util.getRandomInteger(data.GUESTS_RANGE[0], data.GUESTS_RANGE[1]);
-export const getRandomCheckTime = () => util.getRandomArrayElement(data.CHECK_TIME);
-export const getFeatures = () => util.shuffleArray(data.FEATURES.slice(0, util.getRandomInteger(1, data.FEATURES.length)));
-export const getRandomDescription = () => util.getRandomArrayElement(data.DESCRIPTIONS);
-export const getPhotos = () => util.shuffleArray(data.PHOTOS.slice(0, util.getRandomInteger(1, data.PHOTOS.length)));
+const getRandomTitle = () => getRandomArrayElement(data.TITLES);
+const getRandomLat = () => getRandomFloat(data.LAT_RANGE[0], data.LAT_RANGE[1]).toFixed(5);
+const getRandomLng = () => getRandomFloat(data.LNG_RANGE[0], data.LNG_RANGE[1]).toFixed(5);
+const getRandomPrice = () => getRandomInteger(data.PRICE_RANGE[0], data.PRICE_RANGE[1]);
+const getRandomType = () => getRandomArrayElement(data.TYPES);
+const getRandomRooms = () => getRandomInteger(data.ROOMS_RANGE[0], data.ROOMS_RANGE[1]);
+const getRandomGuests = () => getRandomInteger(data.GUESTS_RANGE[0], data.GUESTS_RANGE[1]);
+const getRandomCheckTime = () => getRandomArrayElement(data.CHECK_TIME);
+const getFeatures = () => shuffleArray(data.FEATURES.slice(0, getRandomInteger(1, data.FEATURES.length)));
+const getRandomDescription = () => getRandomArrayElement(data.DESCRIPTIONS);
+const getPhotos = () => shuffleArray(data.PHOTOS.slice(0, getRandomInteger(1, data.PHOTOS.length)));
 
-export const getOffers = (avatar, title, lat, lng, price, type, rooms, guests, checkTime, features, description, photos) => {
+const getOffers = (avatar, title, lat, lng, price, type, rooms, guests, checkTime, features, description, photos) => {
   const offers = [];
 
   for (let i = 0; i < data.OFFERS_COUNT; i++) {
@@ -57,3 +57,18 @@ export const getOffers = (avatar, title, lat, lng, price, type, rooms, guests, c
 
   return offers;
 };
+
+export const offersDescriptions = getOffers(
+  randomAvatarIndexArray,
+  getRandomTitle,
+  getRandomLat,
+  getRandomLng,
+  getRandomPrice,
+  getRandomType,
+  getRandomRooms,
+  getRandomGuests,
+  getRandomCheckTime,
+  getFeatures,
+  getRandomDescription,
+  getPhotos
+);
