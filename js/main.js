@@ -1,19 +1,21 @@
+import {showAlert} from './util.js';
 import {renderOffer} from './render-offers.js';
-import {/*disableForm,*/ addressField, submitOffer} from './form.js';
+import {/*disableForm,*/ addressField, submitOffer, resetButton} from './form.js';
 import {disableMapFilters, enableMapFilters} from './map-filters.js';
 import {renderMap} from './map.js';
-import {getData} from './api.js';
+import {getData, sendData} from './api.js';
+import {showUploadSuccess, showUploadError} from './messages.js';
 
 // disableForm();
 disableMapFilters();
 await getData()
   .then((offers) => {
-    renderMap(enableMapFilters, addressField, offers, renderOffer);
-  });
-// .catch(
-//   (err) => {
-//     showAlert(err.message);
-//   }
-// );
+    renderMap(enableMapFilters, addressField, offers, renderOffer, resetButton);
+  })
+  .catch(
+    (err) => {
+      showAlert(err.message);
+    }
+  );
 
-submitOffer();
+submitOffer(sendData, showUploadSuccess, showUploadError);

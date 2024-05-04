@@ -1,6 +1,7 @@
 const TILE_LAYER = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const COPYRIGHT = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 const ZOOM = 10;
+
 const iconConfig = [
   {
     url: './img/main-pin.svg',
@@ -27,7 +28,7 @@ const startCoordinate = {
   lng: 139.69171,
 };
 
-export const renderMap = (onLoad, address, points, renderPopup) => {
+export const renderMap = (onLoad, address, points, renderPopup, resetButton) => {
   const map = L.map('map-canvas')
     .on('load', () => {
       onLoad();
@@ -83,6 +84,11 @@ export const renderMap = (onLoad, address, points, renderPopup) => {
 
   points.forEach((point) => {
     createMarker(point);
+  });
+
+  resetButton.addEventListener('click', () => {
+    mainPinMarker.setLatLng(startCoordinate);
+    address.value = `${Object.values(startCoordinate)[0].toFixed(5)}, ${Object.values(startCoordinate)[1].toFixed(5)}`;
   });
 
   // markerGroup.clearLayers();
