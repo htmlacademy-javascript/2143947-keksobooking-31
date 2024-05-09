@@ -1,6 +1,9 @@
 const TILE_LAYER = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const COPYRIGHT = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 const ZOOM = 10;
+const MAX_POINTS_SHOWN = 10;
+const HOUSING_PRICE_LOW = 10000;
+const HOUSING_PRICE_HIGH = 50000;
 
 const iconConfig = [
   {
@@ -28,7 +31,11 @@ const startCoordinate = {
   lng: 139.69171,
 };
 
-export const renderMap = (onLoad, address, points, renderPopup, resetButton) => {
+export let resetMarker;
+export let closePopupCard;
+export let filterHousingFeatures;
+
+export const renderMap = (onLoad, address, points, renderPopup) => {
   const map = L.map('map-canvas')
     .on('load', () => {
       onLoad();
@@ -79,18 +86,117 @@ export const renderMap = (onLoad, address, points, renderPopup, resetButton) => 
 
     marker
       .addTo(markerGroup)
-      .bindPopup(renderPopup(point));
+      .bindPopup(renderPopup(point))
+      .on('click', (evt) => {
+        evt.target.openPopup();
+      });
+
+    closePopupCard = () => {
+      marker.closePopup(point);
+    };
   };
 
-  points.forEach((point) => {
+  // Отображение стартовых точек
+
+  points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
     createMarker(point);
   });
 
-  resetButton.addEventListener('click', () => {
-    mainPinMarker.setLatLng(startCoordinate);
-    address.value = `${Object.values(startCoordinate)[0].toFixed(5)}, ${Object.values(startCoordinate)[1].toFixed(5)}`;
+  // Фильтрация по типу жилья
+
+  const housingTypeSelector = document.querySelector('#housing-type');
+  const housingPriceSelector = document.querySelector('#housing-price');
+  const housingRoomsSelector = document.querySelector('#housing-rooms');
+  const housingGuestsSelector = document.querySelector('#housing-guests');
+  const housingFeaturesSelector = document.querySelectorAll('.map__checkbox');
+
+  housingTypeSelector.addEventListener('change', () => {
+    markerGroup.clearLayers();
+    const filteredPoints = points.filter((point) => point.offer.type === housingTypeSelector.value);
+    if (housingTypeSelector.value !== 'any') {
+      filteredPoints.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+        createMarker(point);
+      });
+    } else {
+      points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+        createMarker(point);
+      });
+    }
   });
 
-  // markerGroup.clearLayers();
+  housingPriceSelector.addEventListener('change', () => {
+    markerGroup.clearLayers();
+    const filteredPoints = points.filter((point) => {
+      if (housingPriceSelector.value === 'middle') {
+        return point.offer.price >= HOUSING_PRICE_LOW && point.offer.price <= HOUSING_PRICE_HIGH;
+      }
+      if (housingPriceSelector.value === 'low') {
+        return point.offer.price < HOUSING_PRICE_LOW;
+      }
+      if (housingPriceSelector.value === 'high') {
+        return point.offer.price > HOUSING_PRICE_HIGH;
+      }
+    });
+    if (housingPriceSelector.value !== 'any') {
+      filteredPoints.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+        createMarker(point);
+      });
+    } else {
+      points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+        createMarker(point);
+      });
+    }
+  });
+
+  housingRoomsSelector.addEventListener('change', () => {
+    markerGroup.clearLayers();
+    const filteredPoints = points.filter((point) => point.offer.rooms === parseInt(housingRoomsSelector.value, 10));
+    if (housingRoomsSelector.value !== 'any') {
+      filteredPoints.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+        createMarker(point);
+      });
+    } else {
+      points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+        createMarker(point);
+      });
+    }
+  });
+
+  housingGuestsSelector.addEventListener('change', () => {
+    markerGroup.clearLayers();
+    const filteredPoints = points.filter((point) => point.offer.guests === parseInt(housingGuestsSelector.value, 10));
+    if (housingGuestsSelector.value !== 'any') {
+      filteredPoints.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+        createMarker(point);
+      });
+    } else {
+      points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+        createMarker(point);
+      });
+    }
+  });
+
+  filterHousingFeatures = () => {
+    const checkedFeaturesList = [];
+    housingFeaturesSelector.forEach((feature) => {
+      feature.addEventListener('change', () => {
+        if (feature.checked) {
+          checkedFeaturesList.push(feature.value);
+        }
+      });
+    });
+    const filteredPointsByFeatures = points.filter((point) => {
+      const pointFeatures = point.offer.features;
+      return checkedFeaturesList.every((checkedFeature) => pointFeatures.includes(checkedFeature));
+    });
+    filteredPointsByFeatures.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+      createMarker(point);
+    });
+  };
+
+  resetMarker = () => {
+    mainPinMarker.setLatLng(startCoordinate);
+    address.value = `${Object.values(startCoordinate)[0].toFixed(5)}, ${Object.values(startCoordinate)[1].toFixed(5)}`;
+  };
 };
 

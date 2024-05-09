@@ -1,7 +1,10 @@
+import {resetMarker, closePopupCard} from './map.js';
+
 const TITLE_LENGTH_MIN = 30;
 const TITLE_LENGTH_MAX = 100;
 const PRICE_MIN = 0;
 const PRICE_MAX = 100000;
+const PRICE_START_VALUE = 0;
 
 const form = document.querySelector('.ad-form');
 const formElements = form.querySelectorAll('.ad-form__element');
@@ -35,10 +38,10 @@ const SubmitButtonText = {
   SENDING: 'Публикую...'
 };
 export const resetButton = form.querySelector('.ad-form__reset');
-const featuresCheckboxList = form.querySelectorAll('.features__checkbox');
-const descriptionField = form.querySelector('#description');
-const avatarUrlField = form.querySelector('#avatar');
-const imagesUrlField = form.querySelector('#images');
+// const featuresCheckboxList = form.querySelectorAll('.features__checkbox');
+// const descriptionField = form.querySelector('#description');
+// const avatarUrlField = form.querySelector('#avatar');
+// const imagesUrlField = form.querySelector('#images');
 
 const pristine = new Pristine (form, {
   classTo: 'ad-form__element',
@@ -147,58 +150,10 @@ const unblockSubmitButton = () => {
 //   pristine.destroy();
 // };
 
-// Очистка формы
-
-const resetForm = () => {
-  titleField.value = '';
-  priceField.value = '';
-  roomsField.value = '1';
-  guestsField.value = '3';
-  typeField.value = 'flat';
-  timeInField.value = '12:00';
-  timeOutField.value = '12:00';
-  for (let i = 0; i < featuresCheckboxList.length; i++) {
-    featuresCheckboxList[i].checked = false;
-  }
-  descriptionField.value = '';
-  avatarUrlField.value = '';
-  imagesUrlField.value = '';
-};
-
-resetButton.addEventListener('click', (evt) => {
-  evt.preventDefault();
-  resetForm();
-  pristine.reset();
-});
-
-// Отправка формы
-
-export const submitOffer = (data, onSuccess, onError) => {
-  form.addEventListener('submit', (evt) => {
-    evt.preventDefault();
-
-    const isValid = pristine.validate();
-
-    if (isValid) {
-      blockSubmitButton();
-      data(new FormData(evt.target))
-        .then(
-          onSuccess(),
-          resetForm(),
-          onError())
-        .catch(onError())
-        .finally(
-          unblockSubmitButton,
-          pristine.reset()
-        );
-    }
-  });
-};
-
 // Слайдер
 
 noUiSlider.create(sliderElement, {
-  start: 0,
+  start: PRICE_START_VALUE,
   connect: [true, false],
   range: {
     'min': PRICE_MIN,
@@ -223,4 +178,46 @@ priceField.addEventListener('change', () => {
   sliderElement.noUiSlider.set(priceField.value);
 });
 
+const resetPriceSlider = () => {
+  sliderElement.noUiSlider.set(PRICE_START_VALUE);
+};
 
+// Очистка формы
+
+resetButton.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  form.reset();
+  resetPriceSlider();
+  resetMarker();
+  closePopupCard();
+  pristine.reset();
+});
+
+// Отправка формы
+
+export const submitOffer = (data, onSuccess, onError) => {
+  form.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
+    const isValid = pristine.validate();
+
+    if (isValid) {
+      blockSubmitButton();
+      data(new FormData(evt.target))
+        .then(() =>{
+          onSuccess();
+          form.reset();
+          resetPriceSlider();
+          resetMarker();
+          closePopupCard();
+        })
+        .catch(() => {
+          onError();
+        })
+        .finally(() => {
+          unblockSubmitButton();
+          pristine.reset();
+        });
+    }
+  });
+};
