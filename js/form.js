@@ -1,4 +1,5 @@
 import {resetMarker, closePopupCard} from './map.js';
+import {resetFilters} from './map-filters.js';
 
 const TITLE_LENGTH_MIN = 30;
 const TITLE_LENGTH_MAX = 100;
@@ -38,10 +39,6 @@ const SubmitButtonText = {
   SENDING: 'Публикую...'
 };
 export const resetButton = form.querySelector('.ad-form__reset');
-// const featuresCheckboxList = form.querySelectorAll('.features__checkbox');
-// const descriptionField = form.querySelector('#description');
-// const avatarUrlField = form.querySelector('#avatar');
-// const imagesUrlField = form.querySelector('#images');
 
 const pristine = new Pristine (form, {
   classTo: 'ad-form__element',
@@ -184,12 +181,17 @@ const resetPriceSlider = () => {
 
 // Очистка формы
 
-resetButton.addEventListener('click', (evt) => {
-  evt.preventDefault();
+const resetForm = () => {
   form.reset();
   resetPriceSlider();
-  resetMarker();
+  resetMarker(addressField);
+  resetFilters();
   closePopupCard();
+};
+
+resetButton.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  resetForm();
   pristine.reset();
 });
 
@@ -206,10 +208,7 @@ export const submitOffer = (data, onSuccess, onError) => {
       data(new FormData(evt.target))
         .then(() =>{
           onSuccess();
-          form.reset();
-          resetPriceSlider();
-          resetMarker();
-          closePopupCard();
+          resetForm();
         })
         .catch(() => {
           onError();

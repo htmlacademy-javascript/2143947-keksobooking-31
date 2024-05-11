@@ -1,9 +1,7 @@
 const TILE_LAYER = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const COPYRIGHT = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 const ZOOM = 10;
-const MAX_POINTS_SHOWN = 10;
-const HOUSING_PRICE_LOW = 10000;
-const HOUSING_PRICE_HIGH = 50000;
+export const MAX_POINTS_SHOWN = 10;
 
 const iconConfig = [
   {
@@ -31,31 +29,32 @@ const startCoordinate = {
   lng: 139.69171,
 };
 
-export let resetMarker;
-export let closePopupCard;
-export let filterHousingFeatures;
+const mainPinIcon = L.icon({
+  iconUrl: iconConfig[0].url,
+  iconSize: [iconConfig[0].width, iconConfig[0].height],
+  iconAnchor: [iconConfig[0].anchorX, iconConfig[0].anchorY],
+});
 
-export const renderMap = (onLoad, address, points, renderPopup) => {
-  const map = L.map('map-canvas')
+const mainPinMarker = L.marker(startCoordinate, {
+  draggable: true,
+  icon: mainPinIcon,
+});
+
+let map;
+export let markerGroup;
+export let createMarker;
+
+export const renderMap = (onLoad, enableForm, address, points, renderPopup) => {
+  map = L.map('map-canvas')
     .on('load', () => {
       onLoad();
+      enableForm();
     })
     .setView(cityCenter, ZOOM);
 
   L.tileLayer(TILE_LAYER, {
     attribution: COPYRIGHT
   }).addTo(map);
-
-  const mainPinIcon = L.icon({
-    iconUrl: iconConfig[0].url,
-    iconSize: [iconConfig[0].width, iconConfig[0].height],
-    iconAnchor: [iconConfig[0].anchorX, iconConfig[0].anchorY],
-  });
-
-  const mainPinMarker = L.marker(startCoordinate, {
-    draggable: true,
-    icon: mainPinIcon,
-  });
 
   mainPinMarker.addTo(map);
 
@@ -71,9 +70,9 @@ export const renderMap = (onLoad, address, points, renderPopup) => {
     iconAnchor: [iconConfig[1].anchorX, iconConfig[1].anchorY],
   });
 
-  const markerGroup = L.layerGroup().addTo(map);
+  markerGroup = L.layerGroup().addTo(map);
 
-  const createMarker = (point) => {
+  createMarker = (point) => {
     const lat = point.location.lat;
     const lng = point.location.lng;
     const marker = L.marker({
@@ -86,14 +85,7 @@ export const renderMap = (onLoad, address, points, renderPopup) => {
 
     marker
       .addTo(markerGroup)
-      .bindPopup(renderPopup(point))
-      .on('click', (evt) => {
-        evt.target.openPopup();
-      });
-
-    closePopupCard = () => {
-      marker.closePopup(point);
-    };
+      .bindPopup(renderPopup(point));
   };
 
   // Отображение стартовых точек
@@ -101,102 +93,17 @@ export const renderMap = (onLoad, address, points, renderPopup) => {
   points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
     createMarker(point);
   });
-
-  // Фильтрация по типу жилья
-
-  const housingTypeSelector = document.querySelector('#housing-type');
-  const housingPriceSelector = document.querySelector('#housing-price');
-  const housingRoomsSelector = document.querySelector('#housing-rooms');
-  const housingGuestsSelector = document.querySelector('#housing-guests');
-  const housingFeaturesSelector = document.querySelectorAll('.map__checkbox');
-
-  housingTypeSelector.addEventListener('change', () => {
-    markerGroup.clearLayers();
-    const filteredPoints = points.filter((point) => point.offer.type === housingTypeSelector.value);
-    if (housingTypeSelector.value !== 'any') {
-      filteredPoints.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
-        createMarker(point);
-      });
-    } else {
-      points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
-        createMarker(point);
-      });
-    }
-  });
-
-  housingPriceSelector.addEventListener('change', () => {
-    markerGroup.clearLayers();
-    const filteredPoints = points.filter((point) => {
-      if (housingPriceSelector.value === 'middle') {
-        return point.offer.price >= HOUSING_PRICE_LOW && point.offer.price <= HOUSING_PRICE_HIGH;
-      }
-      if (housingPriceSelector.value === 'low') {
-        return point.offer.price < HOUSING_PRICE_LOW;
-      }
-      if (housingPriceSelector.value === 'high') {
-        return point.offer.price > HOUSING_PRICE_HIGH;
-      }
-    });
-    if (housingPriceSelector.value !== 'any') {
-      filteredPoints.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
-        createMarker(point);
-      });
-    } else {
-      points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
-        createMarker(point);
-      });
-    }
-  });
-
-  housingRoomsSelector.addEventListener('change', () => {
-    markerGroup.clearLayers();
-    const filteredPoints = points.filter((point) => point.offer.rooms === parseInt(housingRoomsSelector.value, 10));
-    if (housingRoomsSelector.value !== 'any') {
-      filteredPoints.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
-        createMarker(point);
-      });
-    } else {
-      points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
-        createMarker(point);
-      });
-    }
-  });
-
-  housingGuestsSelector.addEventListener('change', () => {
-    markerGroup.clearLayers();
-    const filteredPoints = points.filter((point) => point.offer.guests === parseInt(housingGuestsSelector.value, 10));
-    if (housingGuestsSelector.value !== 'any') {
-      filteredPoints.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
-        createMarker(point);
-      });
-    } else {
-      points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
-        createMarker(point);
-      });
-    }
-  });
-
-  filterHousingFeatures = () => {
-    const checkedFeaturesList = [];
-    housingFeaturesSelector.forEach((feature) => {
-      feature.addEventListener('change', () => {
-        if (feature.checked) {
-          checkedFeaturesList.push(feature.value);
-        }
-      });
-    });
-    const filteredPointsByFeatures = points.filter((point) => {
-      const pointFeatures = point.offer.features;
-      return checkedFeaturesList.every((checkedFeature) => pointFeatures.includes(checkedFeature));
-    });
-    filteredPointsByFeatures.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
-      createMarker(point);
-    });
-  };
-
-  resetMarker = () => {
-    mainPinMarker.setLatLng(startCoordinate);
-    address.value = `${Object.values(startCoordinate)[0].toFixed(5)}, ${Object.values(startCoordinate)[1].toFixed(5)}`;
-  };
 };
 
+// Сброс маркера на начальную точкку
+
+export const resetMarker = (address) => {
+  mainPinMarker.setLatLng(startCoordinate);
+  address.value = `${Object.values(startCoordinate)[0].toFixed(5)}, ${Object.values(startCoordinate)[1].toFixed(5)}`;
+};
+
+// Закрытие карточки объявления
+
+export const closePopupCard = () => {
+  map.closePopup();
+};

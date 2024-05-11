@@ -1,16 +1,18 @@
 import {showAlert} from './util.js';
 import {renderOffer} from './render-offers.js';
-import {/*disableForm,*/ addressField, submitOffer, resetButton} from './form.js';
-import {disableMapFilters, enableMapFilters} from './map-filters.js';
-import {renderMap, filterHousingFeatures} from './map.js';
+import {disableForm, enableForm, addressField, submitOffer} from './form.js';
+import {disableMapFilters, enableMapFilters, filterHousing} from './map-filters.js';
+import {renderMap, markerGroup, createMarker, MAX_POINTS_SHOWN} from './map.js';
 import {getData, sendData} from './api.js';
 import {showUploadSuccess, showUploadError} from './messages.js';
+import {listenImgUpload} from './upload-images.js';
 
-// disableForm();
+disableForm();
 disableMapFilters();
 await getData()
   .then((offers) => {
-    renderMap(enableMapFilters, addressField, offers, renderOffer, resetButton);
+    renderMap(enableMapFilters, enableForm, addressField, offers, renderOffer);
+    filterHousing(markerGroup, offers, createMarker, MAX_POINTS_SHOWN);
   })
   .catch(
     (err) => {
@@ -19,4 +21,4 @@ await getData()
   );
 
 submitOffer(sendData, showUploadSuccess, showUploadError);
-filterHousingFeatures();
+listenImgUpload();

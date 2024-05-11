@@ -60,3 +60,11 @@ export const showAlert = (message) => {
     alertContainer.remove();
   }, ALERT_SHOW_TIME);
 };
+
+export const debounce = (callback, timeoutDelay) => {
+  let timeoutId;
+  return () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback(), timeoutDelay);
+  };
+};
