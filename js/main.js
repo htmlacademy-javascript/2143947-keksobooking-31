@@ -11,7 +11,8 @@ disableForm();
 disableMapFilters();
 await getData()
   .then((offers) => {
-    renderMap(enableMapFilters, enableForm, addressField, offers, renderOffer);
+    enableMapFilters();
+    renderMap(enableForm, addressField, offers, renderOffer);
     filterHousing(markerGroup, offers, createMarker, MAX_POINTS_SHOWN);
   })
   .catch(

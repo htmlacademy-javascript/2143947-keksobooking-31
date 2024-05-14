@@ -44,10 +44,9 @@ let map;
 export let markerGroup;
 export let createMarker;
 
-export const renderMap = (onLoad, enableForm, address, points, renderPopup) => {
+export const renderMap = (enableForm, address, points, renderPopup) => {
   map = L.map('map-canvas')
     .on('load', () => {
-      onLoad();
       enableForm();
     })
     .setView(cityCenter, ZOOM);

@@ -1,8 +1,13 @@
-import {debounce} from './util.js';
+// import {debounce} from './util.js';
 
-const HOUSING_PRICE_LOW = 10000;
-const HOUSING_PRICE_HIGH = 50000;
-const RERENDER_DELAY = 5000;
+// const RERENDER_DELAY = 5000;
+
+const Price = {
+  'any': {min: 0, max: 100000},
+  'low': {min: 0, max: 10000},
+  'middle': {min: 10000, max: 50000},
+  'high': {min: 50000, max: 100000},
+};
 
 const mapFilters = document.querySelector('.map__filters');
 const mapFiltersElements = mapFilters.querySelectorAll('.map__filter');
@@ -28,97 +33,38 @@ export const enableMapFilters = () => {
   mapFeatures.removeAttribute('disabled');
 };
 
+let checkedFeatures;
+
+// const filterFeatures = (point) => {
+//   checkedFeatures.every((feature) => point.offer.features?.includes(feature));
+// };
+
+const listenFilters = (points) => points
+  .filter((point) => housingTypeSelector[0].selected || point.offer?.type === housingTypeSelector.value)
+  .filter((point) => housingPriceSelector[0].selected || point.offer?.price <= Price[housingPriceSelector.value].max && point.offer?.price >= Price[housingPriceSelector.value].min)
+  .filter((point) => housingRoomsSelector[0].selected || point.offer?.rooms === Number(housingRoomsSelector.value))
+  .filter((point) => housingGuestsSelector[0].selected || point.offer?.guests === Number(housingGuestsSelector.value))
+  // .filter((point) => filterFeatures(point))
+  .filter((point) => checkedFeatures.every((feature) => point.offer.features?.includes(feature)));
+
+const refreshMarkers = (markerGroup, points, createMarker, pointsShown) => {
+  markerGroup.clearLayers();
+  points.slice(0, pointsShown).forEach((point) => {
+    createMarker(point);
+  });
+};
+
 export let resetFilters;
 
 // Фильтрация по типу жилья
 
 export const filterHousing = (markerGroup, points, createMarker, pointsShown) => {
   mapFilters.addEventListener('change', () => {
-    const listenFilters = () => {
-      // Фильтрация по типу жилья
+    checkedFeatures = Array.from(mapFilters.querySelectorAll('.map__checkbox:checked'), (input) => input.value);
+    refreshMarkers(markerGroup, listenFilters(points), createMarker, pointsShown);
 
-      const filteredTypePoints = points.filter((point) =>{
-        markerGroup.clearLayers();
-        if (housingTypeSelector.value !== 'any') {
-          return point.offer.type === housingTypeSelector.value;
-        }
-        return points;
-      });
-
-      filteredTypePoints.slice(0, pointsShown).forEach((point) => {
-        createMarker(point);
-      });
-
-      // Фильтрация по цене жилья
-
-      const filteredPricePoints = filteredTypePoints.filter((point) => {
-        markerGroup.clearLayers();
-        if (housingPriceSelector.value === 'any') {
-          return filteredTypePoints;
-        }
-        if (housingPriceSelector.value === 'middle') {
-          return point.offer.price >= HOUSING_PRICE_LOW && point.offer.price <= HOUSING_PRICE_HIGH;
-        }
-        if (housingPriceSelector.value === 'low') {
-          return point.offer.price < HOUSING_PRICE_LOW;
-        }
-        if (housingPriceSelector.value === 'high') {
-          return point.offer.price > HOUSING_PRICE_HIGH;
-        }
-      });
-
-      filteredPricePoints.slice(0, pointsShown).forEach((point) => {
-        createMarker(point);
-      });
-
-      // Фильтрация по количеству комнат
-
-      const filteredRoomsPoints = filteredPricePoints.filter((point) => {
-        markerGroup.clearLayers();
-        if (housingRoomsSelector.value !== 'any') {
-          return point.offer.rooms === parseInt(housingRoomsSelector.value, 10);
-        }
-
-        return filteredPricePoints;
-      });
-
-      filteredRoomsPoints.slice(0, pointsShown).forEach((point) => {
-        createMarker(point);
-      });
-
-      // Фильтрация по количеству гостей
-
-      const filteredGuestsPoints = filteredRoomsPoints.filter((point) => {
-        markerGroup.clearLayers();
-        if (housingGuestsSelector.value !== 'any') {
-          return point.offer.guests === parseInt(housingGuestsSelector.value, 10);
-        }
-
-        return filteredRoomsPoints;
-      });
-
-      filteredGuestsPoints.slice(0, pointsShown).forEach((point) => {
-        createMarker(point);
-      });
-
-      // Фильтрация по удобствам
-
-      const checkedFeatures = Array.from(mapFilters.querySelectorAll('.map__checkbox:checked'), (input) => input.value);
-      const filteredFeaturesPoints = filteredGuestsPoints.filter((point) => {
-        markerGroup.clearLayers();
-        if (point.offer.features) {
-          return checkedFeatures.every((feature) => point.offer.features.includes(feature));
-        }
-        return filteredGuestsPoints;
-      });
-
-      filteredFeaturesPoints.slice(0, pointsShown).forEach((point) => {
-        createMarker(point);
-      });
-    };
-
-    const debounceFunc = debounce(() => listenFilters(), RERENDER_DELAY);
-    debounceFunc();
+    // const debounceFunc = debounce(() => listenFilters(), RERENDER_DELAY);
+    // debounceFunc();
   });
 
   // Сброс фильтров
@@ -131,4 +77,3 @@ export const filterHousing = (markerGroup, points, createMarker, pointsShown) =>
     });
   };
 };
-
