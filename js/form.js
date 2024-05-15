@@ -140,13 +140,6 @@ const unblockSubmitButton = () => {
   submitButton.textContent = SubmitButtonText.IDLE;
 };
 
-// Отключение pristine
-
-// const destroyPristine = () => {
-//   pristine.reset();
-//   pristine.destroy();
-// };
-
 // Слайдер
 
 noUiSlider.create(sliderElement, {

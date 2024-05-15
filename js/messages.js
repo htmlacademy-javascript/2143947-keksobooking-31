@@ -8,31 +8,31 @@ const errorButton = uploadError.querySelector('.error__button');
 export const showUploadError = () => {
   document.body.append(uploadError);
 
-  document.addEventListener('keydown', onDocumentKeydownCloseError);
+  document.addEventListener('keydown', onDocumentKeydown);
   errorButton.addEventListener('click', closeUploadError);
-  uploadError.addEventListener('click', onWindowClickCloseError);
+  uploadError.addEventListener('click', onWindowClick);
 };
 
 function closeUploadError () {
   document.body.removeChild(uploadError);
 
-  document.removeEventListener('keydown', onDocumentKeydownCloseError);
+  document.removeEventListener('keydown', onDocumentKeydown);
   errorButton.removeEventListener('click', closeUploadError);
-  uploadError.removeEventListener('click', onWindowClickCloseError);
+  uploadError.removeEventListener('click', onWindowClick);
 }
 
-function onDocumentKeydownCloseError(evt) {
-  if (isEscapeKey(evt)) {
-    evt.preventDefault();
-    closeUploadError();
-  }
-}
+// function onDocumentKeydownCloseError(evt) {
+//   if (isEscapeKey(evt)) {
+//     evt.preventDefault();
+//     closeUploadError();
+//   }
+// }
 
-function onWindowClickCloseError(evt) {
-  if (!evt.target.closest('.body')) {
-    closeUploadError();
-  }
-}
+// function onWindowClickCloseError(evt) {
+//   if (!evt.target.closest('.body')) {
+//     closeUploadError();
+//   }
+// }
 
 // Открытие и закрытие окна успешной загрузки изображения
 
@@ -41,25 +41,47 @@ const uploadSuccess = document.querySelector('#success').content.querySelector('
 export const showUploadSuccess = () => {
   document.body.append(uploadSuccess);
 
-  document.addEventListener('keydown', onDocumentKeydownCloseSuccess);
-  uploadSuccess.addEventListener('click', onWindowClickCloseSuccess);
+  document.addEventListener('keydown', onDocumentKeydown);
+  uploadSuccess.addEventListener('click', onWindowClick);
 };
 
 function closeUploadSuccess () {
   document.body.removeChild(uploadSuccess);
 
-  document.removeEventListener('keydown', onDocumentKeydownCloseSuccess);
-  uploadSuccess.removeEventListener('click', onWindowClickCloseSuccess);
+  document.removeEventListener('keydown', onDocumentKeydown);
+  uploadSuccess.removeEventListener('click', onWindowClick);
 }
 
-function onDocumentKeydownCloseSuccess(evt) {
+// function onDocumentKeydownCloseSuccess(evt) {
+//   if (isEscapeKey(evt)) {
+//     evt.preventDefault();
+//     closeUploadSuccess();
+//   }
+// }
+// function onWindowClickCloseSuccess(evt) {
+//   if (!evt.target.closest('.body')) {
+//     closeUploadSuccess();
+//   }
+// }
+
+function onDocumentKeydown(evt) {
   if (isEscapeKey(evt)) {
     evt.preventDefault();
-    closeUploadSuccess();
+    if (uploadError) {
+      closeUploadError();
+    }
+    if (uploadSuccess) {
+      closeUploadSuccess();
+    }
   }
 }
-function onWindowClickCloseSuccess(evt) {
+function onWindowClick(evt) {
   if (!evt.target.closest('.body')) {
-    closeUploadSuccess();
+    if (uploadError) {
+      closeUploadError();
+    }
+    if (uploadSuccess) {
+      closeUploadSuccess();
+    }
   }
 }

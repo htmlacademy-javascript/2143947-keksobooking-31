@@ -1,6 +1,6 @@
-// import {debounce} from './util.js';
+import {throttle} from './util.js';
 
-// const RERENDER_DELAY = 5000;
+const RERENDER_DELAY = 5000;
 
 const Price = {
   'any': {min: 0, max: 100000},
@@ -61,10 +61,7 @@ export let resetFilters;
 export const filterHousing = (markerGroup, points, createMarker, pointsShown) => {
   mapFilters.addEventListener('change', () => {
     checkedFeatures = Array.from(mapFilters.querySelectorAll('.map__checkbox:checked'), (input) => input.value);
-    refreshMarkers(markerGroup, listenFilters(points), createMarker, pointsShown);
-
-    // const debounceFunc = debounce(() => listenFilters(), RERENDER_DELAY);
-    // debounceFunc();
+    throttle(refreshMarkers(markerGroup, listenFilters(points), createMarker, pointsShown), RERENDER_DELAY);
   });
 
   // Сброс фильтров
