@@ -4,6 +4,7 @@ import {isEscapeKey} from './util.js';
 
 export const uploadError = document.querySelector('#error').content.querySelector('.error');
 const errorButton = uploadError.querySelector('.error__button');
+const uploadSuccess = document.querySelector('#success').content.querySelector('.success');
 
 export const showUploadError = () => {
   document.body.append(uploadError);
@@ -21,22 +22,7 @@ function closeUploadError () {
   uploadError.removeEventListener('click', onWindowClick);
 }
 
-// function onDocumentKeydownCloseError(evt) {
-//   if (isEscapeKey(evt)) {
-//     evt.preventDefault();
-//     closeUploadError();
-//   }
-// }
-
-// function onWindowClickCloseError(evt) {
-//   if (!evt.target.closest('.body')) {
-//     closeUploadError();
-//   }
-// }
-
 // Открытие и закрытие окна успешной загрузки изображения
-
-const uploadSuccess = document.querySelector('#success').content.querySelector('.success');
 
 export const showUploadSuccess = () => {
   document.body.append(uploadSuccess);
@@ -52,35 +38,24 @@ function closeUploadSuccess () {
   uploadSuccess.removeEventListener('click', onWindowClick);
 }
 
-// function onDocumentKeydownCloseSuccess(evt) {
-//   if (isEscapeKey(evt)) {
-//     evt.preventDefault();
-//     closeUploadSuccess();
-//   }
-// }
-// function onWindowClickCloseSuccess(evt) {
-//   if (!evt.target.closest('.body')) {
-//     closeUploadSuccess();
-//   }
-// }
-
 function onDocumentKeydown(evt) {
   if (isEscapeKey(evt)) {
     evt.preventDefault();
-    if (uploadError) {
+    if (document.querySelector('.error')) {
       closeUploadError();
     }
-    if (uploadSuccess) {
+    if (document.querySelector('.success')) {
       closeUploadSuccess();
     }
   }
 }
+
 function onWindowClick(evt) {
   if (!evt.target.closest('.body')) {
-    if (uploadError) {
+    if (document.querySelector('.error')) {
       closeUploadError();
     }
-    if (uploadSuccess) {
+    if (document.querySelector('.success')) {
       closeUploadSuccess();
     }
   }

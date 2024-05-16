@@ -41,8 +41,8 @@ const mainPinMarker = L.marker(startCoordinate, {
 });
 
 let map;
-export let markerGroup;
-export let createMarker;
+let markerGroup;
+let createMarker;
 
 export const renderMap = (enableForm, address, points, renderPopup) => {
   map = L.map('map-canvas')
@@ -105,4 +105,11 @@ export const resetMarker = (address) => {
 
 export const closePopupCard = () => {
   map.closePopup();
+};
+
+export const refreshMarkers = (points) => {
+  markerGroup.clearLayers();
+  points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+    createMarker(point);
+  });
 };

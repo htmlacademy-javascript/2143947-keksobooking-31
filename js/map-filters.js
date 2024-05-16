@@ -35,7 +35,7 @@ export const enableMapFilters = () => {
 
 const filterFeatures = (point) => {
   const checkedFeatures = Array.from(mapFilters.querySelectorAll('.map__checkbox:checked'), (input) => input.value);
-  checkedFeatures.every((feature) => point.offer.features?.includes(feature));
+  return checkedFeatures.every((feature) => point.offer.features?.includes(feature));
 };
 
 const listenFilters = (points) => points
@@ -45,29 +45,19 @@ const listenFilters = (points) => points
   .filter((point) => housingGuestsSelector[0].selected || point.offer?.guests === Number(housingGuestsSelector.value))
   .filter((point) => filterFeatures(point));
 
-const refreshMarkers = (markerGroup, points, createMarker, pointsShown) => {
-  markerGroup.clearLayers();
-  points.slice(0, pointsShown).forEach((point) => {
-    createMarker(point);
-  });
-};
-
 export let resetFilters;
 
 // Фильтрация по типу жилья
 
-export const filterHousing = (markerGroup, points, createMarker, pointsShown) => {
+export const filterHousing = (refreshMarkers, points) => {
   mapFilters.addEventListener('change', () => {
-    throttle(refreshMarkers(markerGroup, listenFilters(points), createMarker, pointsShown), RERENDER_DELAY);
+    throttle(refreshMarkers(listenFilters(points)), RERENDER_DELAY);
   });
 
   // Сброс фильтров
 
   resetFilters = () => {
     mapFilters.reset();
-    markerGroup.clearLayers();
-    points.slice(0, pointsShown).forEach((point) => {
-      createMarker(point);
-    });
+    refreshMarkers(points);
   };
 };
