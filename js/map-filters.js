@@ -33,19 +33,17 @@ export const enableMapFilters = () => {
   mapFeatures.removeAttribute('disabled');
 };
 
-let checkedFeatures;
-
-// const filterFeatures = (point) => {
-//   checkedFeatures.every((feature) => point.offer.features?.includes(feature));
-// };
+const filterFeatures = (point) => {
+  const checkedFeatures = Array.from(mapFilters.querySelectorAll('.map__checkbox:checked'), (input) => input.value);
+  checkedFeatures.every((feature) => point.offer.features?.includes(feature));
+};
 
 const listenFilters = (points) => points
   .filter((point) => housingTypeSelector[0].selected || point.offer?.type === housingTypeSelector.value)
   .filter((point) => housingPriceSelector[0].selected || point.offer?.price <= Price[housingPriceSelector.value].max && point.offer?.price >= Price[housingPriceSelector.value].min)
   .filter((point) => housingRoomsSelector[0].selected || point.offer?.rooms === Number(housingRoomsSelector.value))
   .filter((point) => housingGuestsSelector[0].selected || point.offer?.guests === Number(housingGuestsSelector.value))
-  // .filter((point) => filterFeatures(point))
-  .filter((point) => checkedFeatures.every((feature) => point.offer.features?.includes(feature)));
+  .filter((point) => filterFeatures(point));
 
 const refreshMarkers = (markerGroup, points, createMarker, pointsShown) => {
   markerGroup.clearLayers();
@@ -60,7 +58,6 @@ export let resetFilters;
 
 export const filterHousing = (markerGroup, points, createMarker, pointsShown) => {
   mapFilters.addEventListener('change', () => {
-    checkedFeatures = Array.from(mapFilters.querySelectorAll('.map__checkbox:checked'), (input) => input.value);
     throttle(refreshMarkers(markerGroup, listenFilters(points), createMarker, pointsShown), RERENDER_DELAY);
   });
 
