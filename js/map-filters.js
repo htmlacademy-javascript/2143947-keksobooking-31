@@ -45,19 +45,23 @@ const listenFilters = (points) => points
   .filter((point) => housingGuestsSelector[0].selected || point.offer?.guests === Number(housingGuestsSelector.value))
   .filter((point) => filterFeatures(point));
 
-export let resetFilters;
+let initialPoints;
 
 // Фильтрация по типу жилья
 
 export const filterHousing = (refreshMarkers, points) => {
   mapFilters.addEventListener('change', () => {
-    throttle(refreshMarkers(listenFilters(points)), RERENDER_DELAY);
+    refreshMarkers(listenFilters(points));
+    const throttleMarkers = throttle(refreshMarkers, RERENDER_DELAY);
+    throttleMarkers(listenFilters(points));
   });
 
-  // Сброс фильтров
+  initialPoints = points;
+};
 
-  resetFilters = () => {
-    mapFilters.reset();
-    refreshMarkers(points);
-  };
+// Сброс фильтров
+
+export const resetFilters = (refreshMarkers) => {
+  mapFilters.reset();
+  refreshMarkers(initialPoints);
 };

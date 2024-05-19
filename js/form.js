@@ -1,4 +1,4 @@
-import {resetMarker, closePopupCard} from './map.js';
+import {resetMarker, closePopupCard, refreshMarkers} from './map.js';
 import {resetFilters} from './map-filters.js';
 
 const TITLE_LENGTH_MIN = 30;
@@ -178,7 +178,7 @@ const resetForm = () => {
   form.reset();
   resetPriceSlider();
   resetMarker(addressField);
-  resetFilters();
+  resetFilters(refreshMarkers);
   closePopupCard();
 };
 
