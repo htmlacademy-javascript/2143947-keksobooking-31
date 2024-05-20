@@ -2,7 +2,7 @@ import {renderOffer} from './render-offers.js';
 
 const TILE_LAYER = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const COPYRIGHT = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-const ZOOM = 10;
+const ZOOM = 12;
 export const MAX_POINTS_SHOWN = 10;
 
 const iconConfig = [
@@ -99,6 +99,7 @@ export const renderMap = (enableForm, address, points) => {
 // Сброс маркера на начальную точкку
 
 export const resetMarker = (address) => {
+  map.setView(cityCenter, ZOOM);
   mainPinMarker.setLatLng(startCoordinate);
   address.value = `${Object.values(startCoordinate)[0].toFixed(5)}, ${Object.values(startCoordinate)[1].toFixed(5)}`;
 };
@@ -115,3 +116,5 @@ export const refreshMarkers = (points) => {
     createMarker(point);
   });
 };
+
+
