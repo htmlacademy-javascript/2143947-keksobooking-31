@@ -1,4 +1,4 @@
-import {showAlert} from './util.js';
+import {showAlert, throttle} from './util.js';
 import {renderOffer} from './render-offers.js';
 import {disableForm, enableForm, addressField, submitOffer} from './form.js';
 import {disableMapFilters, enableMapFilters, filterHousing} from './map-filters.js';
@@ -13,7 +13,7 @@ await getData()
   .then((offers) => {
     enableMapFilters();
     renderMap(enableForm, addressField, offers, renderOffer);
-    filterHousing(refreshMarkers, offers);
+    filterHousing(refreshMarkers, offers, throttle);
   })
   .catch(
     (err) => {

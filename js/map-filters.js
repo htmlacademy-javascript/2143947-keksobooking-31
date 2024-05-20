@@ -1,6 +1,4 @@
-import {throttle} from './util.js';
-
-const RERENDER_DELAY = 5000;
+const RERENDER_DELAY = 500;
 
 const Price = {
   'any': {min: 0, max: 100000},
@@ -49,14 +47,11 @@ let initialPoints;
 
 // Фильтрация по типу жилья
 
-export const filterHousing = (refreshMarkers, points) => {
-  mapFilters.addEventListener('change', () => {
-    refreshMarkers(listenFilters(points));
-    const throttleMarkers = throttle(refreshMarkers, RERENDER_DELAY);
-    throttleMarkers(listenFilters(points));
-  });
-
+export const filterHousing = (refreshMarkers, points, delayFunction) => {
   initialPoints = points;
+
+  const onFiltersChange = delayFunction(() => refreshMarkers(listenFilters(points)), RERENDER_DELAY);
+  mapFilters.addEventListener('change', onFiltersChange);
 };
 
 // Сброс фильтров
