@@ -1,3 +1,5 @@
+import {renderOffer} from './render-offers.js';
+
 const TILE_LAYER = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const COPYRIGHT = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 const ZOOM = 10;
@@ -44,7 +46,7 @@ let map;
 let markerGroup;
 let createMarker;
 
-export const renderMap = (enableForm, address, points, renderPopup) => {
+export const renderMap = (enableForm, address, points) => {
   map = L.map('map-canvas')
     .on('load', () => {
       enableForm();
@@ -84,7 +86,7 @@ export const renderMap = (enableForm, address, points, renderPopup) => {
 
     marker
       .addTo(markerGroup)
-      .bindPopup(renderPopup(point));
+      .bindPopup(renderOffer(point));
   };
 
   // Отображение стартовых точек

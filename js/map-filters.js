@@ -1,3 +1,5 @@
+import {refreshMarkers} from './map.js';
+
 const RERENDER_DELAY = 500;
 
 const Price = {
@@ -47,7 +49,7 @@ let initialPoints;
 
 // Фильтрация по типу жилья
 
-export const filterHousing = (refreshMarkers, points, delayFunction) => {
+export const filterHousing = (points, delayFunction) => {
   initialPoints = points;
 
   const onFiltersChange = delayFunction(() => refreshMarkers(listenFilters(points)), RERENDER_DELAY);
@@ -56,7 +58,7 @@ export const filterHousing = (refreshMarkers, points, delayFunction) => {
 
 // Сброс фильтров
 
-export const resetFilters = (refreshMarkers) => {
+export const resetFilters = () => {
   mapFilters.reset();
   refreshMarkers(initialPoints);
 };
