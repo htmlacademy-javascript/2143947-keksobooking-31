@@ -13,12 +13,11 @@ await getData()
     enableMapFilters();
     renderMap(enableForm, addressField, offers);
     filterHousing(offers, throttle);
+    submitOffer(sendData, showUploadSuccess, showUploadError);
+    listenImgUpload();
   })
   .catch(
     (err) => {
       showAlert(err.message);
     }
   );
-
-submitOffer(sendData, showUploadSuccess, showUploadError);
-listenImgUpload();
