@@ -1,5 +1,11 @@
+import {resetMarker, closePopupCard} from './map.js';
+import {resetFilters} from './map-filters.js';
+
 const TITLE_LENGTH_MIN = 30;
 const TITLE_LENGTH_MAX = 100;
+const PRICE_MIN = 0;
+const PRICE_MAX = 100000;
+const PRICE_START_VALUE = 0;
 
 const form = document.querySelector('.ad-form');
 const formElements = form.querySelectorAll('.ad-form__element');
@@ -32,12 +38,13 @@ const SubmitButtonText = {
   IDLE: 'Опубликовать',
   SENDING: 'Публикую...'
 };
+export const resetButton = form.querySelector('.ad-form__reset');
 
 const pristine = new Pristine (form, {
   classTo: 'ad-form__element',
   errorTextParent: 'ad-form__element',
   errorClass: 'ad-form__element--invalid',
-}, false);
+},);
 
 // Валидация заголовка
 
@@ -62,8 +69,8 @@ const minPriceAmount = {
 let priceErrorMessage = '';
 
 const validatePrice = (value) => {
-  if (value > 100000) {
-    priceErrorMessage = 'Не более 100 000 руб.';
+  if (value > PRICE_MAX) {
+    priceErrorMessage = `Не более ${PRICE_MAX} руб.`;
     return false;
   }
 
@@ -82,7 +89,7 @@ pristine.addValidator(
 );
 
 const onTypeChange = () => {
-  priceField.placeholder = minPriceAmount[this.value];
+  priceField.placeholder = minPriceAmount[typeField.value];
   pristine.validate(priceField);
 };
 
@@ -128,41 +135,19 @@ const blockSubmitButton = () => {
   submitButton.textContent = SubmitButtonText.SENDING;
 };
 
-// const unblockSubmitButton = () => {
-//   submitButton.disabled = false;
-//   submitButton.textContent = SubmitButtonText.IDLE;
-// };
-
-// Отправка формы
-
-export const submitOffer = () => {
-  form.addEventListener('submit', (evt) => {
-    evt.preventDefault();
-
-    const isValid = pristine.validate();
-
-    if (isValid) {
-      blockSubmitButton();
-      pristine.reset();
-    }
-  });
+const unblockSubmitButton = () => {
+  submitButton.disabled = false;
+  submitButton.textContent = SubmitButtonText.IDLE;
 };
-
-// Отключение pristine
-
-// const destroyPristine = () => {
-//   pristine.reset();
-//   pristine.destroy();
-// };
 
 // Слайдер
 
 noUiSlider.create(sliderElement, {
-  start: 5000,
+  start: PRICE_START_VALUE,
   connect: [true, false],
   range: {
-    'min': 0,
-    'max': 100000,
+    'min': PRICE_MIN,
+    'max': PRICE_MAX,
   },
   format: {
     to: function (value) {
@@ -172,13 +157,59 @@ noUiSlider.create(sliderElement, {
       return parseFloat(value);
     },
   },
-  step: 500,
+  step: 1,
 });
 
-sliderElement.noUiSlider.on('update', (values, handle) => {
-  priceField.value = values[handle];
+sliderElement.noUiSlider.on('slide', () => {
+  priceField.value = sliderElement.noUiSlider.get();
 });
 
 priceField.addEventListener('change', () => {
   sliderElement.noUiSlider.set(priceField.value);
 });
+
+const resetPriceSlider = () => {
+  sliderElement.noUiSlider.set(PRICE_START_VALUE);
+};
+
+// Очистка формы
+
+const resetForm = () => {
+  form.reset();
+  resetPriceSlider();
+  resetMarker(addressField);
+  resetFilters();
+  closePopupCard();
+};
+
+resetButton.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  resetForm();
+  pristine.reset();
+});
+
+// Отправка формы
+
+export const submitOffer = (data, onSuccess, onError) => {
+  form.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
+    const isValid = pristine.validate();
+
+    if (isValid) {
+      blockSubmitButton();
+      data(new FormData(evt.target))
+        .then(() =>{
+          onSuccess();
+          resetForm();
+        })
+        .catch(() => {
+          onError();
+        })
+        .finally(() => {
+          unblockSubmitButton();
+          pristine.reset();
+        });
+    }
+  });
+};

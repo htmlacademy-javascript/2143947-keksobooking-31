@@ -1,6 +1,10 @@
+import {renderOffer} from './render-offers.js';
+
 const TILE_LAYER = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const COPYRIGHT = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-const ZOOM = 10;
+const ZOOM = 12;
+export const MAX_POINTS_SHOWN = 10;
+
 const iconConfig = [
   {
     url: './img/main-pin.svg',
@@ -27,27 +31,31 @@ const startCoordinate = {
   lng: 139.69171,
 };
 
-export const renderMap = (onLoad, address, points, renderPopup) => {
-  const map = L.map('map-canvas')
+const mainPinIcon = L.icon({
+  iconUrl: iconConfig[0].url,
+  iconSize: [iconConfig[0].width, iconConfig[0].height],
+  iconAnchor: [iconConfig[0].anchorX, iconConfig[0].anchorY],
+});
+
+const mainPinMarker = L.marker(startCoordinate, {
+  draggable: true,
+  icon: mainPinIcon,
+});
+
+let map;
+let markerGroup;
+let createMarker;
+
+export const renderMap = (enableForm, address, points) => {
+  map = L.map('map-canvas')
     .on('load', () => {
-      onLoad();
+      enableForm();
     })
     .setView(cityCenter, ZOOM);
 
   L.tileLayer(TILE_LAYER, {
     attribution: COPYRIGHT
   }).addTo(map);
-
-  const mainPinIcon = L.icon({
-    iconUrl: iconConfig[0].url,
-    iconSize: [iconConfig[0].width, iconConfig[0].height],
-    iconAnchor: [iconConfig[0].anchorX, iconConfig[0].anchorY],
-  });
-
-  const mainPinMarker = L.marker(startCoordinate, {
-    draggable: true,
-    icon: mainPinIcon,
-  });
 
   mainPinMarker.addTo(map);
 
@@ -63,9 +71,9 @@ export const renderMap = (onLoad, address, points, renderPopup) => {
     iconAnchor: [iconConfig[1].anchorX, iconConfig[1].anchorY],
   });
 
-  const markerGroup = L.layerGroup().addTo(map);
+  markerGroup = L.layerGroup().addTo(map);
 
-  const createMarker = (point) => {
+  createMarker = (point) => {
     const lat = point.location.lat;
     const lng = point.location.lng;
     const marker = L.marker({
@@ -78,13 +86,35 @@ export const renderMap = (onLoad, address, points, renderPopup) => {
 
     marker
       .addTo(markerGroup)
-      .bindPopup(renderPopup(point));
+      .bindPopup(renderOffer(point));
   };
 
-  points.forEach((point) => {
+  // Отображение стартовых точек
+
+  points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
     createMarker(point);
   });
-
-  // markerGroup.clearLayers();
 };
+
+// Сброс маркера на начальную точкку
+
+export const resetMarker = (address) => {
+  map.setView(cityCenter, ZOOM);
+  mainPinMarker.setLatLng(startCoordinate);
+  address.value = `${Object.values(startCoordinate)[0].toFixed(5)}, ${Object.values(startCoordinate)[1].toFixed(5)}`;
+};
+
+// Закрытие карточки объявления
+
+export const closePopupCard = () => {
+  map.closePopup();
+};
+
+export const refreshMarkers = (points) => {
+  markerGroup.clearLayers();
+  points.slice(0, MAX_POINTS_SHOWN).forEach((point) => {
+    createMarker(point);
+  });
+};
+
 
